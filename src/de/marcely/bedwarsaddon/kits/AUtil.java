@@ -3,7 +3,7 @@ package de.marcely.bedwarsaddon.kits;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import de.marcely.bedwars.util.Util;
+import de.marcely.bedwars.api.Util;
 
 public class AUtil {
 	
@@ -17,9 +17,9 @@ public class AUtil {
 	}
 	
 	public static ItemStack getItemStack(String str){
-		String[] strs = str.split("\\,");
+		final String[] strs = str.split("\\,");
+		final ItemStack is = Util.getItemItemstackByName(strs[0]);
 		
-		ItemStack is = Util.getIcon(strs[0]);
 		if(is != null){
 			if(strs.length == 2 && Util.isInteger(strs[1]))
 				is.setAmount(Integer.valueOf(strs[1]));

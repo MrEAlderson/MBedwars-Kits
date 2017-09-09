@@ -8,10 +8,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import de.marcely.bedwars.api.ArenaStatus;
 import de.marcely.bedwars.api.event.ArenaStatusUpdateEvent;
 import de.marcely.bedwars.api.event.PlayerJoinArenaEvent;
 import de.marcely.bedwars.api.event.PlayerQuitArenaEvent;
-import de.marcely.bedwars.game.arena.ArenaStatus;
 
 public class Events implements Listener {
 	

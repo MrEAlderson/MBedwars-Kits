@@ -13,14 +13,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import de.marcely.bedwars.util.Util;
+import de.marcely.bedwars.Language;
 import de.marcely.bedwars.api.BedwarsAPI;
 import de.marcely.bedwars.api.BedwarsAddon;
 import de.marcely.bedwars.api.BedwarsAddon.BedwarsAddonCommand;
-import de.marcely.bedwars.api.LobbyItem;
+import de.marcely.bedwars.api.CustomLobbyItem;
+import de.marcely.bedwars.api.Util;
+import de.marcely.bedwars.api.VersionAPI;
 import de.marcely.bedwars.api.gui.GUI;
 import de.marcely.bedwars.api.gui.GUIItem;
-import de.marcely.bedwars.versions.Version;
 
 public class BedwarsAddonKits extends JavaPlugin {
 	
@@ -29,7 +30,7 @@ public class BedwarsAddonKits extends JavaPlugin {
 	
 	public static List<Kit> kits = new ArrayList<Kit>();
 	public static String kitsGUITitle = ChatColor.GOLD + "Kits";
-	public static LobbyItem lobbyItem = null;
+	public static CustomLobbyItem lobbyItem = null;
 	
 	public static HashMap<Player, Kit> selectedKits = new HashMap<Player, Kit>();
 	
@@ -47,7 +48,10 @@ public class BedwarsAddonKits extends JavaPlugin {
 		bedwarsAddon.registerCommand(new BedwarsAddonCommand("reload"){
 			@Override
 			public void onWrite(CommandSender sender, String[] args, String fullUsage){
+				final long startTime = System.currentTimeMillis();
+				sender.sendMessage(Language.Configurations_Reload_Start.getMessage());
 				load();
+				sender.sendMessage(Language.Configurations_Reload_End.getMessage().replace("{time}", "" + ((System.currentTimeMillis() - startTime) / 1000D)));
 			}
 		});
 	}
@@ -68,19 +72,19 @@ public class BedwarsAddonKits extends JavaPlugin {
 			ItemMeta im = is.getItemMeta();
 			im.setLore(lore);
 			is.setItemMeta(im);
-			kit.setIcon(Version.removeAttributes(is)); // also remove meta attributes
+			kit.setIcon(VersionAPI.removeAttributes(is)); // also remove meta attributes
 		}
 		
 		// add lobby item
-		BedwarsAPI.registerLobbyItem(new LobbyItem("kits"){
+		BedwarsAPI.registerLobbyItem(new CustomLobbyItem("kits"){
 			@Override
 			public void onUse(Player player){
 				GUI gui = new GUI(kitsGUITitle, 0);
 				for(final Kit kit:kits){
-					ItemStack is = Util.renameItemStack(kit.getIcon().clone(), ChatColor.WHITE + kit.getName());
+					ItemStack is = Util.renameItemstack(kit.getIcon().clone(), ChatColor.WHITE + kit.getName());
 					
 					if(selectedKits.containsKey(player) && selectedKits.get(player).equals(kit))
-						is = Version.addGlow(is);
+						is = VersionAPI.addGlow(is);
 					
 					gui.addItem(new GUIItem(is){
 						@Override

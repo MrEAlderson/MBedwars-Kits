@@ -3,7 +3,7 @@ package de.marcely.bedwarsaddon.kits;
 import org.bukkit.inventory.ItemStack;
 
 import de.marcely.bedwars.Language;
-import de.marcely.bedwars.util.Util;
+import de.marcely.bedwars.api.Util;
 import de.marcely.bedwars.config.ConfigManager;
 import de.marcely.bedwars.config.ConfigManager.MultiKey.MultiKeyEntry;
 
@@ -35,10 +35,10 @@ public class Config {
 			}
 			
 			if(strs[1].equalsIgnoreCase("seticon")){
-				ItemStack is = Util.getIcon(value);
+				ItemStack is = Util.getItemItemstackByName(value);
 				
 				if(is != null)
-					kit.setIcon(Util.renameItemStack(is, strs[0]));
+					kit.setIcon(Util.renameItemstack(is, strs[0]));
 			}else if(strs[1].equalsIgnoreCase("additem")){
 				ItemStack is = AUtil.getItemStack(value);
 				
