@@ -31,6 +31,12 @@ public class BedwarsAddonKits extends JavaPlugin {
 	public static List<Kit> kits = new ArrayList<Kit>();
 	public static String kitsGUITitle = ChatColor.GOLD + "Kits";
 	public static CustomLobbyItem lobbyItem = null;
+	public static boolean permissionsEnabled = false;
+	public static String permissionsMissingItemName = "{name} " + ChatColor.RED + "Not granted";
+	public static String message_noPermissions = ChatColor.RED + "You have insufficient permissions!";
+	public static String message_setKit = ChatColor.GREEN + "You changed your Kit to " + ChatColor.DARK_GREEN + "{kit}";
+	public static String message_loreItems = "" + ChatColor.GRAY + ChatColor.UNDERLINE + "Items:";
+	public static String message_loreItemsEach = ChatColor.DARK_PURPLE + " {material}" + ChatColor.LIGHT_PURPLE + " {material-amount}";
 	
 	public static HashMap<Player, Kit> selectedKits = new HashMap<Player, Kit>();
 	
@@ -63,13 +69,16 @@ public class BedwarsAddonKits extends JavaPlugin {
 		
 		// set lores of every kit
 		for(Kit kit:kits){
-			List<String> lore = new ArrayList<String>();
-			lore.add("" + ChatColor.GRAY + ChatColor.UNDERLINE + "Items:");
-			for(ItemStack is:kit.getItems())
-				lore.add(ChatColor.DARK_PURPLE + " " + AUtil.getMaterialUserFriendlyName(is.getType()) + ChatColor.LIGHT_PURPLE + " " + is.getAmount());
+			final List<String> lore = new ArrayList<String>();
 			
-			ItemStack is = kit.getIcon();
-			ItemMeta im = is.getItemMeta();
+			lore.add(message_loreItems);
+			
+			for(ItemStack is:kit.getItems())
+				lore.add(message_loreItemsEach.replace("{material}", AUtil.getMaterialUserFriendlyName(is.getType()).replace("{material-amount}", "" + is.getAmount())));
+			
+			final ItemStack is = kit.getIcon();
+			final ItemMeta im = is.getItemMeta();
+			
 			im.setLore(lore);
 			is.setItemMeta(im);
 			kit.setIcon(VersionAPI.removeAttributes(is)); // also remove meta attributes
@@ -79,26 +88,47 @@ public class BedwarsAddonKits extends JavaPlugin {
 		BedwarsAPI.registerLobbyItem(new CustomLobbyItem("kits"){
 			@Override
 			public void onUse(Player player){
-				GUI gui = new GUI(kitsGUITitle, 0);
+				final GUI gui = new GUI(kitsGUITitle, 0);
+				
 				for(final Kit kit:kits){
-					ItemStack is = Util.renameItemstack(kit.getIcon().clone(), ChatColor.WHITE + kit.getName());
+					if(permissionsEnabled && !Util.hasPermission(player, getPermission(kit.getName()))){
+						final ItemStack is = Util.renameItemstack(
+								kit.getIcon().clone(),
+								permissionsMissingItemName.replace("{name}", ChatColor.WHITE + kit.getName()));
+						
+						gui.addItem(new GUIItem(is){
+							@Override
+							public void onClick(Player whoClicked, boolean leftClick, boolean shiftClick){
+								whoClicked.sendMessage(message_noPermissions);
+							}
+						});
 					
-					if(selectedKits.containsKey(player) && selectedKits.get(player).equals(kit))
-						is = VersionAPI.addGlow(is);
-					
-					gui.addItem(new GUIItem(is){
-						@Override
-						public void onClick(Player whoClicked, boolean leftClick, boolean shiftClick){
-							selectedKits.put(whoClicked, kit);
-							
-							whoClicked.sendMessage(ChatColor.GREEN + "You changed your Kit to " + ChatColor.DARK_GREEN + kit.getName());
-							whoClicked.closeInventory();
-						}
-					});
+					}else{
+						ItemStack is = Util.renameItemstack(
+								kit.getIcon().clone(),
+								ChatColor.WHITE + kit.getName());
+						
+						if(selectedKits.containsKey(player) && selectedKits.get(player).equals(kit))
+							is = VersionAPI.addGlow(is);
+						
+						gui.addItem(new GUIItem(is){
+							@Override
+							public void onClick(Player whoClicked, boolean leftClick, boolean shiftClick){
+								selectedKits.put(whoClicked, kit);
+								
+								whoClicked.sendMessage(message_setKit.replace("{kit}", kit.getName()));
+								whoClicked.closeInventory();
+							}
+						});
+					}
 				}
 				
 				gui.open(player);
 			}
 		});
+	}
+	
+	public static String getPermission(String kit){
+		return "mbedwars.addon.kits." + kit;
 	}
 }

@@ -29,6 +29,10 @@ public class AUtil {
 			return null;
 	}
 	
+	public static String toString(ItemStack is){
+		return Util.itemstackToConfigName(is) + "," + is.getAmount();
+	}
+	
 	public static String getMaterialUserFriendlyName(Material m){
 		String name = "";
 		
