@@ -74,7 +74,7 @@ public class BedwarsAddonKits extends JavaPlugin {
 			lore.add(message_loreItems);
 			
 			for(ItemStack is:kit.getItems())
-				lore.add(message_loreItemsEach.replace("{material}", AUtil.getMaterialUserFriendlyName(is.getType()).replace("{material-amount}", "" + is.getAmount())));
+				lore.add(message_loreItemsEach.replace("{material}", AUtil.getMaterialUserFriendlyName(is.getType())).replace("{material-amount}", "" + is.getAmount()));
 			
 			final ItemStack is = kit.getIcon();
 			final ItemMeta im = is.getItemMeta();
